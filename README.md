@@ -1,23 +1,17 @@
-# EXP-04-Interfacing a 16X2 type LCD display to LPC2148 ARM 7Microcontroller
+# EXPERIMENT 04: INTERFACING A 16X2 TYPE LCD DISPLAY TO LPC2148 ARM 7 MICROCONTROLLER
 
-Name :
+Name : RITHIGA SRI.B  
+Roll Number: 21221230083  
+Date of experiment : 14.10.2022  
 
-Roll no :
-
-Date of experiment :
-
- 
-
-
-## Interfacing a 16X2 type LCD display to LPC2148 ARM 7 Microcontroller 
-
-## Aim: 
-To Interface 16X2 type LCD display to LPC2148 ARM 7 and write a code for displaying a string to it
-## Components required:
-Proteus ISIS professional suite, Kiel μ vision 5 Development environment 
-## Theory 
- 
-## LCD16X2 
+## INTERFACING A 16X2 TYPE LCD TO DISPLAY LPC2148 ARM 7 MICROCONTROLLER
+## AIM: 
+To Interface 16X2 type LCD display to LPC2148 ARM 7 and write a code for displaying a string to it.
+## COMPONENTS REQUIRED:
+* Proteus ISIS professional suite
+* Kiel μ vision 5 Development environment 
+## THEORY:
+## LCD 16X2:
  
  ![image](https://user-images.githubusercontent.com/36288975/195774401-e3bffb44-0d3d-4b7e-b374-7a7a7ef60d48.png)
 
@@ -42,7 +36,7 @@ Read/Write(RW): This signal is used to write the data/cmd to LCD and reads the b
 
 Enable(EN): This pin is used to send the enable trigger to LCD. After sending the data/cmd, Selecting the data/cmd register, Selecting the Write operation. A HIGH-to-LOW pulse has to be send on this enable pin which will latch the info into the LCD register and triggers the LCD to act accordingly.
 
-Procedure:
+## PROCEDURE:
 For creation of project on    Kiel μ vision 5 Development environment (LPC21 XX/48/38)
 1.	Click on the menu Project — New µVision Project creates a new project. Select an empty folder and enter the project name, for example Project1. It is good practice to use a separate folder for each project.
 2.	Next, the dialog Select Device for Target opens.
@@ -120,25 +114,92 @@ Figure -12 Hex file for simulation
 
 Step 9: Select the hex file from the Kiel program folder and import the program in to the microcontroller as shown in figure 11 ,  debug and if no errors in connections are found, run the VSM simulation to view the output.
 
+## KIEL PROGRAM:
+```
+#include <lpc214x.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-## Kiel - Program  
+void delay_ms(uint16_t j) /* Function for delay in milliseconds  */
+{
+    uint16_t x,i;
+	for(i=0;i<j;i++)
+	{
+    for(x=0; x<6000; x++);    /* loop to generate 1 millisecond delay with Cclk = 60MHz */
+	}
+}
 
+void LCD_CMD(char command)
+{
+	IO0PIN = ( (IO0PIN & 0xFFFF00FF) | (command<<8) );
+	IO0SET = 0x00000040; /* EN = 1 */
+	IO0CLR = 0x00000030; /* RS = 0, RW = 0 */
+	delay_ms(2);
+	IO0CLR = 0x00000040; /* EN = 0, RS and RW unchanged(i.e. RS = RW = 0) */
+	delay_ms(5);
+}
 
+void LCD_INIT(void)
+{
+	IO0DIR = 0x0000FFF0; /* P0.8 to P0.15 LCD Data. P0.4,5,6 as RS RW and EN */
+	delay_ms(20);
+	LCD_CMD(0x38);  /* Initialize lcd */
+	LCD_CMD(0x0C);   /* Display on cursor off */
+	LCD_CMD(0x06);  /* Auto increment cursor */
+	LCD_CMD(0x01);   /* Display clear */
+	LCD_CMD(0x80);  /* First line first position */
+}
 
+void LCD_STRING (char* msg)
+{
+	uint8_t i=0;
+	while(msg[i]!=0)
+	{
+		IO0PIN = ( (IO0PIN & 0xFFFF00FF) | (msg[i]<<8) );
+		IO0SET = 0x00000050; /* RS = 1, , EN = 1 */
+		IO0CLR = 0x00000020; /* RW = 0 */
+		delay_ms(2);
+		IO0CLR = 0x00000040; /* EN = 0, RS and RW unchanged(i.e. RS = 1, RW = 0) */
+		delay_ms(5);
+		i++;
+	}
+}
 
+void LCD_CHAR (char msg)
+{
+		IO0PIN = ( (IO0PIN & 0xFFFF00FF) | (msg<<8) );
+		IO0SET = 0x00000050; /* RS = 1, , EN = 1 */
+		IO0CLR = 0x00000020; /* RW = 0 */
+		delay_ms(2);
+		IO0CLR = 0x00000040; /* EN = 0, RS and RW unchanged(i.e. RS = 1, RW = 0) */
+		delay_ms(5);
+}
 
-## Proteus simulation 
+int main(void)
+{
 
+	LCD_INIT();
+	LCD_STRING("212221230083");//first line
+	LCD_CMD(0xC0);
+	LCD_STRING("RITHIGA SRI.B");//second line
 
+	return 0;
+}
+```
 
+## PROTEUS SIMULATION:
+* BEFORE SIMULATION:
+![output](./pic1.png)
+* AFTER SIMULATION:
+![output](./pic2.png)
 
-##  layout Diagram 
+## LAYOUT DIAGRAM: 
+![output](./layout.png)
 
+## RESULT :
 
-
-## Result :
-
-Interfaced an LCD with ARM microcontroller is executed and displayed the strings  
+Interfaced an LCD with ARM microcontroller is executed and displayed the strings.
 
  
 
